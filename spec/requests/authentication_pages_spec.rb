@@ -14,6 +14,11 @@ describe "Authentication" do
 	describe "signin" do 
 		before { visit signin_path }
 
+    describe "with no user signed in" do 
+      it { should_not have_link('Profile') }
+      it { should_not have_link('Settings') }
+    end
+
 		describe "with invalid information" do 
 			before { click_button "Sign in" }
 
@@ -62,6 +67,17 @@ describe "Authentication" do
           it "should render the desired protected page" do
             expect(page).to have_title('Edit User')
           end
+
+          describe "when signing in again" do
+            before do 
+              delete signout_path
+              sign_in user
+            end
+
+            it "should render the default (profile) page" do 
+              expect(page).to have_title(user.name)
+            end
+          end
         end
       end
 
@@ -83,6 +99,28 @@ describe "Authentication" do
 	      end
       end
 		end
+
+    describe "as signed-in user" do 
+      let(:user) { FactoryGirl.create(:user) }
+
+      describe "visiting the new user page" do 
+        before do
+          sign_in user 
+          visit signup_path
+        end
+
+        it { should_not have_title('|') }
+      end
+
+      describe "submitting to the create action" do 
+        before do 
+          sign_in user, no_capybara: true
+          post users_path
+        end
+
+        specify { expect(response).to redirect_to(root_url) }
+      end
+    end
 
     describe "as wrong user" do
       let(:user) { FactoryGirl.create(:user) }
