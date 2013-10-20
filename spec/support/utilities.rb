@@ -1,6 +1,6 @@
 include ApplicationHelper
 
-def valid_signin(user, options = {})
+def sign_in(user, options = {})
   if options[:no_capybara]
     # Sign in when not using Capybara.
     remember_token = User.new_remember_token
@@ -14,7 +14,8 @@ def valid_signin(user, options = {})
   end
 end
 
-def valid_signup(user)
+def sign_up(user)
+  visit signup_path
 	fill_in "Name",					with: user.name
 	fill_in "Email",				with: user.email
 	fill_in "Password",			with: user.password
